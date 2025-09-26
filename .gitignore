@@ -5,3 +5,7 @@ __pycache__/
 
 data/data_css_challenge.csv
 data/cleaned_data.csv
+
+data/data_css_challenge_cleaned.csv
+
+healthcare_model.pkl

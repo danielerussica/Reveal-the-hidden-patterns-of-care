@@ -43,6 +43,333 @@ class HealthcareNetworkDashboard:
         self.network_data = None
         self.filtered_data = None
         
+        # German to English translation mappings
+        self.translations = {
+            # Age groups
+            '0-10 Jahre': '0-10 Years',
+            '10-20 Jahre': '10-20 Years', 
+            '20-30 Jahre': '20-30 Years',
+            '30-40 Jahre': '30-40 Years',
+            '40-50 Jahre': '40-50 Years',
+            '50-60 Jahre': '50-60 Years',
+            '60-70 Jahre': '60-70 Years',
+            '70-80 Jahre': '70-80 Years',
+            '80-90 Jahre': '80-90 Years',
+            '90+ Jahre': '90+ Years',
+            
+            # Reasons for treatment
+            'Krankheit': 'Illness',
+            'Unfall': 'Accident',
+            'Mutterschaft': 'Maternity',
+            'Prävention': 'Prevention',
+            'Vorsorge': 'Preventive Care',
+            'Nachsorge': 'Follow-up Care',
+            
+            # Healthcare provider main groups
+            'Spitäler': 'Hospitals',
+            'SpitÃ¤ler': 'Hospitals',  # Handle encoding issues
+            'Ärzte und Ärztinnen': 'Doctors',
+            'Ã„rzte und Ã„rztinnen': 'Doctors',  # Handle encoding issues
+            'Laboratorien': 'Laboratories',
+            'Pflegeheime': 'Nursing Homes',
+            'Apotheken': 'Pharmacies',
+            'Physiotherapie': 'Physiotherapy',
+            'Ergotherapie': 'Occupational Therapy',
+            'Psychologie': 'Psychology',
+            'Zahnärzte': 'Dentists',
+            'Optiker': 'Opticians',
+            'Abgabestellen Mittel und Gegenstände': 'Medical Device Dispensing Points',
+            'Chiropraktoren und Chiropraktorinnen': 'Chiropractors',
+            'Ergotherapeuten und Ergotherapeutinnen': 'Occupational Therapists',
+            'Ernährungsberater und Ernährungsberaterinnen': 'Nutritional Counselors',
+            'Fitness': 'Fitness',
+            'Hebammen': 'Midwives',
+            'Komplementärtherapeuten und -therapeutinnen': 'Complementary Therapists',
+            'Logopäden und Logopädinnen': 'Speech Therapists',
+            'Neuropsychologen und Neuropsychologinnen': 'Neuropsychologists',
+            'Organisationen der Krankenpflege & Hilfe zu Hause': 'Nursing & Home Care Organizations',
+            'Pflegefachmänner und Pflegefachfrauen': 'Professional Nurses',
+            'Physiotherapeuten und Physiotherapeutinnen': 'Physiotherapists',
+            'Podologen und Podologinnen': 'Podologists',
+            'Psych. Psychotherapeuten und Psychotherapeutinnen': 'Psychological Psychotherapists',
+            'Transport-/Rettungsunternehmen': 'Transport/Rescue Companies',
+            'Übrige Rechnungssteller': 'Other Billing Entities',
+            
+            # Healthcare provider types (extended)
+            'Zentrumsversorgung, Niveau 1': 'Central Care, Level 1',
+            'Zentrumsversorgung, Niveau 2': 'Central Care, Level 2',
+            'Zentrumsversorgung, Niveau 3': 'Central Care, Level 3',
+            'Zentrumsversorgung, Niveau 4': 'Central Care, Level 4',
+            'Zentrumsversorgung, Niveau 5': 'Central Care, Level 5',
+            'Zentrumsversorgung': 'Central Care',
+            'Grundversorgung': 'Basic Care',
+            'Spezialisierte Psychiatrie': 'Specialized Psychiatry',
+            'Psychiatrische Kliniken': 'Psychiatric Clinics',
+            'Rehabilitation': 'Rehabilitation',
+            'Gruppenpraxen': 'Group Practices',
+            'Einzelpraxen': 'Individual Practices',
+            'Gemeinschaftspraxen': 'Community Practices',
+            'Polikliniken': 'Polyclinics',
+            'Tageskliniken': 'Day Clinics',
+            'Ambulatorien': 'Outpatient Clinics',
+            'Notfallzentren': 'Emergency Centers',
+            'Universitätsspitäler': 'University Hospitals',
+            'Regionalspitäler': 'Regional Hospitals',
+            'Kantonsspitäler': 'Cantonal Hospitals',
+            'Privatspitäler': 'Private Hospitals',
+            'Spezialkliniken': 'Specialty Clinics',
+            'Spezialkliniken Chirurgie': 'Surgical Specialty Clinics',
+            'Pflegeheime': 'Nursing Homes',
+            'Privatlaboratorien': 'Private Laboratories',
+            'Mikrobiologie/Genetik-Laboratorien': 'Microbiology/Genetics Laboratories',
+            'Mikrobiologie-Laboratorien': 'Microbiology Laboratories',
+            'Organisationen der Apotheker und Apothekerinnen': 'Pharmacy Organizations',
+            'Organisationen der Krankenpflege & Hilfe zu Hause': 'Nursing & Home Care Organizations',
+            'Physiotherapeuten und Physiotherapeutinnen': 'Physiotherapists',
+            'Chiropraktoren und Chiropraktorinnen': 'Chiropractors',
+            'Psych. Psychotherapeuten und Psychotherapeutinnen': 'Psychological Psychotherapists',
+            'praktischer Arzt / Ärztin': 'General Practitioner',
+            'Ärzte, Spezialfälle': 'Doctors, Special Cases',
+            'Übrige Rechnungssteller': 'Other Billing Entities',
+            'Übrige Rechnungssteller, Spezialfälle': 'Other Billing Entities, Special Cases',
+            'Abgabestellen Mittel und Gegenstände': 'Medical Device Dispensing Points',
+            'Akut- und Übergangspflege': 'Acute and Transitional Care',
+            'Alters- und Pflegeheime': 'Elderly and Nursing Homes',
+            'Apotheken, Spezialfälle': 'Pharmacies, Special Cases',
+            'Blutspendezentren': 'Blood Donation Centers',
+            'Diverse Spezialkliniken': 'Various Specialty Clinics',
+            'Ergotherapeuten und Ergotherapeutinnen': 'Occupational Therapists',
+            'Ergotherapiezentren': 'Occupational Therapy Centers',
+            'Ernährungsberater und Ernährungsberaterinnen': 'Nutritional Counselors',
+            'Ernährungsberatung, Organisation': 'Nutritional Counseling, Organization',
+            'Fitness': 'Fitness',
+            'Geburtshäuser': 'Birth Centers',
+            'Gemeinsame Einrichtung KVG': 'Joint Health Insurance Institution',
+            'Genetik-Laboratorien': 'Genetics Laboratories',
+            'Grundversorgung, Niveau 3': 'Basic Care, Level 3',
+            'Grundversorgung, Niveau 4': 'Basic Care, Level 4',
+            'Grundversorgung, Niveau 5': 'Basic Care, Level 5',
+            'Hebammen': 'Midwives',
+            'Heime für Behinderte': 'Homes for Disabled',
+            'Komplementärtherapeuten und -therapeutinnen': 'Complementary Therapists',
+            'Logopäden und Logopädinnen': 'Speech Therapists',
+            'Neuropsychologen und Neuropsychologinnen': 'Neuropsychologists',
+            'Organisationen der Chiropraktik': 'Chiropractic Organizations',
+            'Organisationen der Hebammen': 'Midwife Organizations',
+            'Organisationen der Krankenpflege & Hilfe zu Hause AÜP': 'Nursing & Home Care Organizations AÜP',
+            'Organisationen der Krankenpflege & Hilfe zu Hause TON': 'Nursing & Home Care Organizations TON',
+            'Organisationen der Logopädie': 'Speech Therapy Organizations',
+            'Organisationen der Neuropsychologie': 'Neuropsychology Organizations',
+            'Organisationen der Physiotherapie': 'Physiotherapy Organizations',
+            'Organisationen der Podologie': 'Podology Organizations',
+            'Organisationen der psychologischen Psychotherapie': 'Psychological Psychotherapy Organizations',
+            'Pflegefachmänner und Pflegefachfrauen': 'Professional Nurses',
+            'Pflegeheime, Spezialfälle (ohne BUR-Zurodnung)': 'Nursing Homes, Special Cases (without BUR assignment)',
+            'Podologen und Podologinnen': 'Podologists',
+            'Prävention und Gesundheitswesen': 'Prevention and Public Health',
+            'Psychiatrische Kliniken, Niveau 1': 'Psychiatric Clinics, Level 1',
+            'Psychiatrische Kliniken, Niveau 2': 'Psychiatric Clinics, Level 2',
+            'Rehabilitationskliniken': 'Rehabilitation Clinics',
+            'Spezialkliniken Geriatrie': 'Geriatric Specialty Clinics',
+            'Spezialkliniken Pädiatrie': 'Pediatric Specialty Clinics',
+            'Spitäler, Spezialfälle (ohne BUR-Zuordnung)': 'Hospitals, Special Cases (without BUR assignment)',
+            'Tages- oder Nachtstrukturen TON': 'Day or Night Structures TON',
+            'Transport-/Rettungsunternehmen, Spezialfälle': 'Transport/Rescue Companies, Special Cases',
+            'Zentrumsversorgung, Niveau 1 (Universitätsspitäler)': 'Central Care, Level 1 (University Hospitals)',
+            'Diabetesgesellschaften': 'Diabetes Societies',
+            
+            # Medical specialties (extended)
+            'Kinder- und Jugendmedizin': 'Pediatrics',
+            'Kinder- und Jugendpsychiatrie und -psychotherapie': 'Child and Adolescent Psychiatry and Psychotherapy',
+            'Gynäkologie und Geburtshilfe': 'Gynecology and Obstetrics',
+            'GynÃ¤kologie und Geburtshilfe': 'Gynecology and Obstetrics',  # Handle encoding issues
+            'Psychiatrie und Psychotherapie': 'Psychiatry and Psychotherapy',
+            'Chirurgie': 'Surgery',
+            'Innere Medizin': 'Internal Medicine',
+            'Allgemeine Innere Medizin': 'General Internal Medicine',
+            'Radiologie': 'Radiology',
+            'Anästhesiologie': 'Anesthesiology',
+            'Dermatologie': 'Dermatology',
+            'Dermatologie und Venerologie': 'Dermatology and Venereology',
+            'Ophthalmologie': 'Ophthalmology',
+            'Orthopädie': 'Orthopedics',
+            'Neurologie': 'Neurology',
+            'Urologie': 'Urology',
+            'HNO': 'ENT (Ear, Nose, Throat)',
+            'Oto-Rhino-Laryngologie': 'Otorhinolaryngology (ENT)',
+            'Kardiologie': 'Cardiology',
+            'Onkologie': 'Oncology',
+            'Endokrinologie': 'Endocrinology',
+            'Rheumatologie': 'Rheumatology',
+            'Nephrologie': 'Nephrology',
+            'Pneumologie': 'Pneumology',
+            'Gastroenterologie': 'Gastroenterology',
+            'Hämatologie': 'Hematology',
+            'Infektiologie': 'Infectious Diseases',
+            'Notfallmedizin': 'Emergency Medicine',
+            'Allgemeinmedizin': 'General Medicine',
+            'Hausarztmedizin': 'Family Medicine',
+            'Tropenmedizin': 'Tropical Medicine',
+            'Arbeitsmedizin': 'Occupational Medicine',
+            'Sportmedizin': 'Sports Medicine',
+            'Geriatrie': 'Geriatrics',
+            'Palliativmedizin': 'Palliative Medicine',
+            'Intensivmedizin': 'Intensive Care Medicine',
+            'Nuklearmedizin': 'Nuclear Medicine',
+            'Pathologie': 'Pathology',
+            'Rechtsmedizin': 'Forensic Medicine',
+            'Labormedizin': 'Laboratory Medicine',
+            'Mikrobiologie': 'Microbiology',
+            'Immunologie': 'Immunology',
+            'Genetik': 'Genetics',
+            'Toxikologie': 'Toxicology',
+            'Pharmakologie': 'Pharmacology',
+            'Hygiene': 'Hygiene',
+            'Epidemiologie': 'Epidemiology',
+            'Biostatistik': 'Biostatistics',
+            'Physikalische Medizin und Rehabilitation': 'Physical Medicine and Rehabilitation',
+            'Allergologie und klinische Immunologie': 'Allergology and Clinical Immunology',
+            'Angiologie': 'Angiology',
+            'Arbeitsmedizin': 'Occupational Medicine',
+            'Gefässchirurgie': 'Vascular Surgery',
+            'Handchirurgie': 'Hand Surgery',
+            'Herz- und thorakale Gefässchirurgie': 'Cardiac and Thoracic Vascular Surgery',
+            'Infektiologie': 'Infectious Diseases',
+            'Intensivmedizin': 'Intensive Care Medicine',
+            'Kiefer- und Gesichtschirurgie': 'Oral and Maxillofacial Surgery',
+            'Kinderchirurgie': 'Pediatric Surgery',
+            'Klinische Pharmakologie und Toxikologie': 'Clinical Pharmacology and Toxicology',
+            'Medizinische Genetik': 'Medical Genetics',
+            'Medizinische Onkologie': 'Medical Oncology',
+            'Neurochirurgie': 'Neurosurgery',
+            'Orthopädische Chirurgie und Traumatologie des Bewegungsapparates': 'Orthopedic Surgery and Traumatology of the Locomotor System',
+            'Plastische, Rekonstruktive und Ästhetische Chirurgie': 'Plastic, Reconstructive and Aesthetic Surgery',
+            'Radio-Onkologie und Strahlentherapie': 'Radio-Oncology and Radiation Therapy',
+            'Tropen- und Reisemedizin': 'Tropical and Travel Medicine',
+            
+            # Other healthcare services
+            'Spitex': 'Home Care',
+            'Ambulante Pflege': 'Outpatient Care',
+            'Stationäre Pflege': 'Inpatient Care',
+            'Langzeitpflege': 'Long-term Care',
+            'Kurzzeitpflege': 'Short-term Care',
+            'Tagespflege': 'Day Care',
+            'Nachtpflege': 'Night Care',
+            'Palliativpflege': 'Palliative Care',
+            'Hospiz': 'Hospice',
+            'Diabetesberatung': 'Diabetes Counseling',
+            'Ernährungsberatung': 'Nutritional Counseling',
+            'Sozialberatung': 'Social Counseling',
+            'Psychologische Beratung': 'Psychological Counseling',
+            'Seelsorge': 'Pastoral Care',
+            'Logopädie': 'Speech Therapy',
+            'Podologie': 'Podology',
+            'Osteopathie': 'Osteopathy',
+            'Chiropraktik': 'Chiropractic',
+            'Homöopathie': 'Homeopathy',
+            'Naturheilkunde': 'Naturopathy',
+            'Akupunktur': 'Acupuncture',
+            'Massage': 'Massage',
+            'Fitness': 'Fitness',
+            'Wellness': 'Wellness',
+            
+            # Gender terms
+            'M': 'Male',
+            'F': 'Female',
+            'W': 'Female',
+            'männlich': 'Male',
+            'weiblich': 'Female',
+            
+            # Common German words that might appear
+            'und': 'and',
+            'oder': 'or',
+            'mit': 'with',
+            'ohne': 'without',
+            'für': 'for',
+            'von': 'from',
+            'zu': 'to',
+            'in': 'in',
+            'an': 'at',
+            'auf': 'on',
+            'bei': 'at',
+            'nach': 'after',
+            'vor': 'before',
+            'über': 'about',
+            'unter': 'under',
+            'durch': 'through',
+            'um': 'around',
+            'gegen': 'against',
+            'zwischen': 'between',
+        }
+        
+        # Column name translations
+        self.column_translations = {
+            'patient_id': 'Patient ID',
+            'age': 'Age',
+            'gender': 'Gender',
+            'reason_for_treatment': 'Treatment Reason',
+            'healthcare_provider_type': 'Provider Type',
+            'healthcare_provider_main_group': 'Provider Group',
+            'client_type': 'Client Type',
+            'client_main_group': 'Client Group',
+            'start_date': 'Start Date',
+            'end_date': 'End Date',
+            'from': 'From',
+            'to': 'To',
+            'weight': 'Transitions',
+            'provider': 'Provider',
+            'unique_patients': 'Unique Patients',
+            'total_visits': 'Total Visits'
+        }
+    
+    def translate_text(self, text):
+        """Translate German text to English using the translation dictionary"""
+        if pd.isna(text) or text == '':
+            return text
+        
+        # Handle exact matches first
+        if str(text) in self.translations:
+            return self.translations[str(text)]
+        
+        # Handle partial matches for complex provider types
+        text_str = str(text)
+        for german_term, english_term in self.translations.items():
+            if german_term in text_str:
+                text_str = text_str.replace(german_term, english_term)
+        
+        return text_str
+    
+    def translate_dataframe(self, df):
+        """Apply translations to relevant columns in the dataframe"""
+        df_translated = df.copy()
+        
+        # Columns that need translation
+        translation_columns = [
+            'age', 'reason_for_treatment', 'healthcare_provider_type', 
+            'healthcare_provider_main_group', 'client_type', 'client_main_group'
+        ]
+        
+        for col in translation_columns:
+            if col in df_translated.columns:
+                df_translated[col] = df_translated[col].apply(self.translate_text)
+        
+        return df_translated
+    
+    def translate_dataframe_for_display(self, df):
+        """Translate both content and column headers for display"""
+        df_display = self.translate_dataframe(df).copy()
+        
+        # Translate column headers
+        new_columns = {}
+        for col in df_display.columns:
+            if col in self.column_translations:
+                new_columns[col] = self.column_translations[col]
+            else:
+                new_columns[col] = col
+        
+        df_display = df_display.rename(columns=new_columns)
+        return df_display
+        
     def load_data(self, sample_size=50000, files_to_load=3):
         """Load and prepare healthcare data"""
         try:
@@ -91,6 +418,10 @@ class HealthcareNetworkDashboard:
             data['end_date'] = pd.to_datetime(data['end_date'], errors='coerce')
             data['treatment_duration_days'] = (data['end_date'] - data['start_date']).dt.days
             data['year_month'] = data['start_date'].dt.to_period('M').astype(str)
+            
+            # Apply translations to German text
+            status_text.text('Translating German text to English...')
+            data = self.translate_dataframe(data)
             
             # Clean provider names for better visualization
             data['provider_clean'] = data['healthcare_provider_type'].apply(
@@ -212,10 +543,10 @@ class HealthcareNetworkDashboard:
                 
                 # Color nodes by provider group
                 color_map = {
-                    'Spitäler': '#FF6B6B',
-                    'Ärzte und Ärztinnen': '#4ECDC4',
-                    'Laboratorien': '#45B7D1',
-                    'Pflegeheime': '#96CEB4',
+                    'Hospitals': '#FF6B6B',
+                    'Doctors': '#4ECDC4',
+                    'Laboratories': '#45B7D1',
+                    'Nursing Homes': '#96CEB4',
                     'Unknown': '#FFEAA7'
                 }
                 color = color_map.get(node['provider_group'], '#DDA0DD')
@@ -356,10 +687,10 @@ class HealthcareNetworkDashboard:
             node_sizes = []
             
             color_map = {
-                'Spitäler': '#FF6B6B',
-                'Ärzte und Ärztinnen': '#4ECDC4',
-                'Laboratorien': '#45B7D1',
-                'Pflegeheime': '#96CEB4',
+                'Hospitals': '#FF6B6B',
+                'Doctors': '#4ECDC4',
+                'Laboratories': '#45B7D1',
+                'Nursing Homes': '#96CEB4',
                 'Unknown': '#FFEAA7'
             }
             
@@ -644,7 +975,9 @@ class HealthcareNetworkDashboard:
                 # Truncate long provider names for display
                 top_edges['from'] = top_edges['from'].apply(lambda x: x[:30] + '...' if len(x) > 30 else x)
                 top_edges['to'] = top_edges['to'].apply(lambda x: x[:30] + '...' if len(x) > 30 else x)
-                st.dataframe(top_edges, use_container_width=True)
+                # Translate column headers
+                top_edges_display = self.translate_dataframe_for_display(top_edges)
+                st.dataframe(top_edges_display, use_container_width=True)
             else:
                 st.info("No connections to display")
         
@@ -654,7 +987,9 @@ class HealthcareNetworkDashboard:
                 top_nodes = nodes_df.nlargest(10, 'unique_patients')[['provider', 'unique_patients', 'total_visits']]
                 # Truncate long provider names for display
                 top_nodes['provider'] = top_nodes['provider'].apply(lambda x: x[:40] + '...' if len(x) > 40 else x)
-                st.dataframe(top_nodes, use_container_width=True)
+                # Translate column headers
+                top_nodes_display = self.translate_dataframe_for_display(top_nodes)
+                st.dataframe(top_nodes_display, use_container_width=True)
             else:
                 st.info("No providers to display")
         
