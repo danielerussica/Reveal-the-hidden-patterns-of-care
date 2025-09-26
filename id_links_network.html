@@ -1,0 +1,265 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 750px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 750px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "0a119182cef2", "label": "0a119182cef2", "shape": "dot", "size": 87}, {"color": "#97c2fc", "id": "725601c6e924", "label": "725601c6e924", "shape": "dot", "size": 58}, {"color": "#97c2fc", "id": "e56cca93021e", "label": "e56cca93021e", "shape": "dot", "size": 67}, {"color": "#97c2fc", "id": "138dd1117454", "label": "138dd1117454", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "96ebeefa1f35", "label": "96ebeefa1f35", "shape": "dot", "size": 46}, {"color": "#97c2fc", "id": "6f1559a787f5", "label": "6f1559a787f5", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "95194c544e11", "label": "95194c544e11", "shape": "dot", "size": 47}, {"color": "#97c2fc", "id": "211da1bd81e3", "label": "211da1bd81e3", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "b6a9e2d35407", "label": "b6a9e2d35407", "shape": "dot", "size": 101}, {"color": "#97c2fc", "id": "fa7103ec638c", "label": "fa7103ec638c", "shape": "dot", "size": 82}, {"color": "#97c2fc", "id": "c996d0b516f6", "label": "c996d0b516f6", "shape": "dot", "size": 58}, {"color": "#97c2fc", "id": "234364e5fac5", "label": "234364e5fac5", "shape": "dot", "size": 72}, {"color": "#97c2fc", "id": "bf390d8249fe", "label": "bf390d8249fe", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "8990edf75edf", "label": "8990edf75edf", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "c326b34b2a8c", "label": "c326b34b2a8c", "shape": "dot", "size": 48}, {"color": "#97c2fc", "id": "ded172d6a5be", "label": "ded172d6a5be", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "6a4fdc0dd1b9", "label": "6a4fdc0dd1b9", "shape": "dot", "size": 62}, {"color": "#97c2fc", "id": "4c6f39071808", "label": "4c6f39071808", "shape": "dot", "size": 79}, {"color": "#97c2fc", "id": "c5fc9f4756ba", "label": "c5fc9f4756ba", "shape": "dot", "size": 6}, {"color": "#97c2fc", "id": "973d4320d908", "label": "973d4320d908", "shape": "dot", "size": 84}, {"color": "#97c2fc", "id": "2837886a7d0b", "label": "2837886a7d0b", "shape": "dot", "size": 56}, {"color": "#97c2fc", "id": "103350430deb", "label": "103350430deb", "shape": "dot", "size": 95}, {"color": "#97c2fc", "id": "c9cd15b39911", "label": "c9cd15b39911", "shape": "dot", "size": 6}, {"color": "#97c2fc", "id": "4259ddbf2d8e", "label": "4259ddbf2d8e", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "49830dfccff5", "label": "49830dfccff5", "shape": "dot", "size": 54}, {"color": "#97c2fc", "id": "ae6bea0772c1", "label": "ae6bea0772c1", "shape": "dot", "size": 63}, {"color": "#97c2fc", "id": "dafe10c0305d", "label": "dafe10c0305d", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "6864f840ab49", "label": "6864f840ab49", "shape": "dot", "size": 47}, {"color": "#97c2fc", "id": "8a5fbaee4dd5", "label": "8a5fbaee4dd5", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "a507338301a0", "label": "a507338301a0", "shape": "dot", "size": 62}, {"color": "#97c2fc", "id": "10d1828db295", "label": "10d1828db295", "shape": "dot", "size": 83}, {"color": "#97c2fc", "id": "533be6bc62c5", "label": "533be6bc62c5", "shape": "dot", "size": 55}, {"color": "#97c2fc", "id": "f634b387b297", "label": "f634b387b297", "shape": "dot", "size": 55}, {"color": "#97c2fc", "id": "686e84c2b17c", "label": "686e84c2b17c", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "4c1439514133", "label": "4c1439514133", "shape": "dot", "size": 65}, {"color": "#97c2fc", "id": "b714e7aa78e9", "label": "b714e7aa78e9", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "f79108b68f5c", "label": "f79108b68f5c", "shape": "dot", "size": 59}, {"color": "#97c2fc", "id": "fe761c542366", "label": "fe761c542366", "shape": "dot", "size": 85}, {"color": "#97c2fc", "id": "31cf62b01080", "label": "31cf62b01080", "shape": "dot", "size": 69}, {"color": "#97c2fc", "id": "7164c44c5f7a", "label": "7164c44c5f7a", "shape": "dot", "size": 66}, {"color": "#97c2fc", "id": "bb90bebcd862", "label": "bb90bebcd862", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "f7b5e86227e6", "label": "f7b5e86227e6", "shape": "dot", "size": 62}, {"color": "#97c2fc", "id": "9ed610233f4e", "label": "9ed610233f4e", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "511c6f583a1c", "label": "511c6f583a1c", "shape": "dot", "size": 63}, {"color": "#97c2fc", "id": "d354208ae11b", "label": "d354208ae11b", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "00991c153845", "label": "00991c153845", "shape": "dot", "size": 53}, {"color": "#97c2fc", "id": "d872f1d4d982", "label": "d872f1d4d982", "shape": "dot", "size": 83}, {"color": "#97c2fc", "id": "6172f14f6940", "label": "6172f14f6940", "shape": "dot", "size": 65}, {"color": "#97c2fc", "id": "9c1663224390", "label": "9c1663224390", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "0f3d5ed4f01e", "label": "0f3d5ed4f01e", "shape": "dot", "size": 50}, {"color": "#97c2fc", "id": "5382af1780c3", "label": "5382af1780c3", "shape": "dot", "size": 77}, {"color": "#97c2fc", "id": "dde1829883af", "label": "dde1829883af", "shape": "dot", "size": 49}, {"color": "#97c2fc", "id": "d63e02670ca4", "label": "d63e02670ca4", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "7c6bfbc6728f", "label": "7c6bfbc6728f", "shape": "dot", "size": 55}, {"color": "#97c2fc", "id": "8d3cbcb061fa", "label": "8d3cbcb061fa", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "9ff431433ba5", "label": "9ff431433ba5", "shape": "dot", "size": 33}, {"color": "#97c2fc", "id": "0295eb1d5bb3", "label": "0295eb1d5bb3", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "883023cd2176", "label": "883023cd2176", "shape": "dot", "size": 101}, {"color": "#97c2fc", "id": "1e74f7de5fee", "label": "1e74f7de5fee", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "84d72f495149", "label": "84d72f495149", "shape": "dot", "size": 51}, {"color": "#97c2fc", "id": "b1c6a1a17cf6", "label": "b1c6a1a17cf6", "shape": "dot", "size": 82}, {"color": "#97c2fc", "id": "d70e49a0564d", "label": "d70e49a0564d", "shape": "dot", "size": 55}, {"color": "#97c2fc", "id": "5388eb68709d", "label": "5388eb68709d", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "c6a4000ce640", "label": "c6a4000ce640", "shape": "dot", "size": 38}, {"color": "#97c2fc", "id": "121528ddc69a", "label": "121528ddc69a", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "ed20ee4415e7", "label": "ed20ee4415e7", "shape": "dot", "size": 90}, {"color": "#97c2fc", "id": "e87c02b81bcd", "label": "e87c02b81bcd", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "20c450959e6f", "label": "20c450959e6f", "shape": "dot", "size": 39}, {"color": "#97c2fc", "id": "87b4a56216bf", "label": "87b4a56216bf", "shape": "dot", "size": 79}, {"color": "#97c2fc", "id": "8f139574f59e", "label": "8f139574f59e", "shape": "dot", "size": 23}, {"color": "#97c2fc", "id": "7a350ba3f426", "label": "7a350ba3f426", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "dec72ce138e8", "label": "dec72ce138e8", "shape": "dot", "size": 80}, {"color": "#97c2fc", "id": "aecb72e90c63", "label": "aecb72e90c63", "shape": "dot", "size": 64}, {"color": "#97c2fc", "id": "f0573a2b1f53", "label": "f0573a2b1f53", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "2ed5f6d2dbed", "label": "2ed5f6d2dbed", "shape": "dot", "size": 60}, {"color": "#97c2fc", "id": "416133b42e13", "label": "416133b42e13", "shape": "dot", "size": 92}, {"color": "#97c2fc", "id": "20b1feeb828a", "label": "20b1feeb828a", "shape": "dot", "size": 58}, {"color": "#97c2fc", "id": "54d11fc01119", "label": "54d11fc01119", "shape": "dot", "size": 49}, {"color": "#97c2fc", "id": "75d74d6426cd", "label": "75d74d6426cd", "shape": "dot", "size": 51}, {"color": "#97c2fc", "id": "e1f61f2afe82", "label": "e1f61f2afe82", "shape": "dot", "size": 19}, {"color": "#97c2fc", "id": "1669ad4eea10", "label": "1669ad4eea10", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "897d38d8f946", "label": "897d38d8f946", "shape": "dot", "size": 61}, {"color": "#97c2fc", "id": "ab91adac81c4", "label": "ab91adac81c4", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "3919de0824ae", "label": "3919de0824ae", "shape": "dot", "size": 61}, {"color": "#97c2fc", "id": "0380d17bb7e8", "label": "0380d17bb7e8", "shape": "dot", "size": 72}, {"color": "#97c2fc", "id": "842e5783751e", "label": "842e5783751e", "shape": "dot", "size": 52}, {"color": "#97c2fc", "id": "92c0d91b9cc7", "label": "92c0d91b9cc7", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "f081330084d4", "label": "f081330084d4", "shape": "dot", "size": 68}, {"color": "#97c2fc", "id": "0a1cef59b20e", "label": "0a1cef59b20e", "shape": "dot", "size": 79}, {"color": "#97c2fc", "id": "db86a7fa3d4b", "label": "db86a7fa3d4b", "shape": "dot", "size": 103}, {"color": "#97c2fc", "id": "d95b969f68b0", "label": "d95b969f68b0", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "4ec347ab98f7", "label": "4ec347ab98f7", "shape": "dot", "size": 58}, {"color": "#97c2fc", "id": "03f986404ca0", "label": "03f986404ca0", "shape": "dot", "size": 75}, {"color": "#97c2fc", "id": "e32c9a0aa488", "label": "e32c9a0aa488", "shape": "dot", "size": 61}, {"color": "#97c2fc", "id": "5be1fc12fdbc", "label": "5be1fc12fdbc", "shape": "dot", "size": 84}, {"color": "#97c2fc", "id": "758baad45177", "label": "758baad45177", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "c513e1b65487", "label": "c513e1b65487", "shape": "dot", "size": 50}, {"color": "#97c2fc", "id": "b31dfc7ad834", "label": "b31dfc7ad834", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "f51dd722d122", "label": "f51dd722d122", "shape": "dot", "size": 91}, {"color": "#97c2fc", "id": "81d278d1040e", "label": "81d278d1040e", "shape": "dot", "size": 70}, {"color": "#97c2fc", "id": "3167418b03a6", "label": "3167418b03a6", "shape": "dot", "size": 78}, {"color": "#97c2fc", "id": "931f65f782d9", "label": "931f65f782d9", "shape": "dot", "size": 80}, {"color": "#97c2fc", "id": "f122178bb340", "label": "f122178bb340", "shape": "dot", "size": 62}, {"color": "#97c2fc", "id": "8bb399be79f2", "label": "8bb399be79f2", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "624d7bfb3fea", "label": "624d7bfb3fea", "shape": "dot", "size": 66}, {"color": "#97c2fc", "id": "da6621121223", "label": "da6621121223", "shape": "dot", "size": 99}, {"color": "#97c2fc", "id": "29a8990e9164", "label": "29a8990e9164", "shape": "dot", "size": 89}, {"color": "#97c2fc", "id": "f35d2349d4ea", "label": "f35d2349d4ea", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "ea6fe06fe53f", "label": "ea6fe06fe53f", "shape": "dot", "size": 56}, {"color": "#97c2fc", "id": "3247e7df2a51", "label": "3247e7df2a51", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "754636b62c7e", "label": "754636b62c7e", "shape": "dot", "size": 51}, {"color": "#97c2fc", "id": "5de7aa910c13", "label": "5de7aa910c13", "shape": "dot", "size": 80}, {"color": "#97c2fc", "id": "f6c3109b1558", "label": "f6c3109b1558", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "655778feaf22", "label": "655778feaf22", "shape": "dot", "size": 82}, {"color": "#97c2fc", "id": "7f42362c00d7", "label": "7f42362c00d7", "shape": "dot", "size": 42}, {"color": "#97c2fc", "id": "48efab7ddb1d", "label": "48efab7ddb1d", "shape": "dot", "size": 81}, {"color": "#97c2fc", "id": "93465a23b536", "label": "93465a23b536", "shape": "dot", "size": 52}, {"color": "#97c2fc", "id": "ab0e4f728ae4", "label": "ab0e4f728ae4", "shape": "dot", "size": 73}, {"color": "#97c2fc", "id": "7db6beda01c6", "label": "7db6beda01c6", "shape": "dot", "size": 6}, {"color": "#97c2fc", "id": "5ec6f4344447", "label": "5ec6f4344447", "shape": "dot", "size": 76}, {"color": "#97c2fc", "id": "67e9e6528b42", "label": "67e9e6528b42", "shape": "dot", "size": 59}, {"color": "#97c2fc", "id": "21cc81247c75", "label": "21cc81247c75", "shape": "dot", "size": 71}, {"color": "#97c2fc", "id": "e38c0990c6a4", "label": "e38c0990c6a4", "shape": "dot", "size": 66}, {"color": "#97c2fc", "id": "d6503809fec2", "label": "d6503809fec2", "shape": "dot", "size": 80}, {"color": "#97c2fc", "id": "16548c35482b", "label": "16548c35482b", "shape": "dot", "size": 67}, {"color": "#97c2fc", "id": "1935efee9a4e", "label": "1935efee9a4e", "shape": "dot", "size": 80}, {"color": "#97c2fc", "id": "3a0a6c7c8088", "label": "3a0a6c7c8088", "shape": "dot", "size": 45}, {"color": "#97c2fc", "id": "7ea0fa556694", "label": "7ea0fa556694", "shape": "dot", "size": 52}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "0a119182cef2", "length": 500, "physics": true, "title": "Count: 1201", "to": "725601c6e924", "width": 1}, {"arrows": "to", "from": "0a119182cef2", "length": 500, "physics": true, "title": "Count: 1176", "to": "e56cca93021e", "width": 1}, {"arrows": "to", "from": "138dd1117454", "length": 500, "physics": true, "title": "Count: 1066", "to": "96ebeefa1f35", "width": 1}, {"arrows": "to", "from": "6f1559a787f5", "length": 500, "physics": true, "title": "Count: 1169", "to": "95194c544e11", "width": 1}, {"arrows": "to", "from": "211da1bd81e3", "length": 500, "physics": true, "title": "Count: 1025", "to": "b6a9e2d35407", "width": 1}, {"arrows": "to", "from": "fa7103ec638c", "length": 500, "physics": true, "title": "Count: 1337", "to": "c996d0b516f6", "width": 1}, {"arrows": "to", "from": "234364e5fac5", "length": 500, "physics": true, "title": "Count: 1211", "to": "bf390d8249fe", "width": 1}, {"arrows": "to", "from": "8990edf75edf", "length": 500, "physics": true, "title": "Count: 1947", "to": "c326b34b2a8c", "width": 1}, {"arrows": "to", "from": "ded172d6a5be", "length": 500, "physics": true, "title": "Count: 2039", "to": "6a4fdc0dd1b9", "width": 1}, {"arrows": "to", "from": "4c6f39071808", "length": 500, "physics": true, "title": "Count: 2283", "to": "c5fc9f4756ba", "width": 1}, {"arrows": "to", "from": "973d4320d908", "length": 500, "physics": true, "title": "Count: 2675", "to": "2837886a7d0b", "width": 1}, {"arrows": "to", "from": "103350430deb", "length": 500, "physics": true, "title": "Count: 1322", "to": "c9cd15b39911", "width": 1}, {"arrows": "to", "from": "4259ddbf2d8e", "length": 500, "physics": true, "title": "Count: 1929", "to": "49830dfccff5", "width": 1}, {"arrows": "to", "from": "4259ddbf2d8e", "length": 500, "physics": true, "title": "Count: 1292", "to": "ae6bea0772c1", "width": 1}, {"arrows": "to", "from": "dafe10c0305d", "length": 500, "physics": true, "title": "Count: 1547", "to": "6864f840ab49", "width": 1}, {"arrows": "to", "from": "8a5fbaee4dd5", "length": 500, "physics": true, "title": "Count: 1893", "to": "a507338301a0", "width": 1}, {"arrows": "to", "from": "10d1828db295", "length": 500, "physics": true, "title": "Count: 1245", "to": "533be6bc62c5", "width": 1}, {"arrows": "to", "from": "10d1828db295", "length": 500, "physics": true, "title": "Count: 1016", "to": "f634b387b297", "width": 1}, {"arrows": "to", "from": "686e84c2b17c", "length": 500, "physics": true, "title": "Count: 1061", "to": "4c1439514133", "width": 1}, {"arrows": "to", "from": "b714e7aa78e9", "length": 500, "physics": true, "title": "Count: 1561", "to": "f79108b68f5c", "width": 1}, {"arrows": "to", "from": "fe761c542366", "length": 500, "physics": true, "title": "Count: 1219", "to": "31cf62b01080", "width": 1}, {"arrows": "to", "from": "fe761c542366", "length": 500, "physics": true, "title": "Count: 2767", "to": "7164c44c5f7a", "width": 1}, {"arrows": "to", "from": "bb90bebcd862", "length": 500, "physics": true, "title": "Count: 1323", "to": "f7b5e86227e6", "width": 1}, {"arrows": "to", "from": "9ed610233f4e", "length": 500, "physics": true, "title": "Count: 1159", "to": "511c6f583a1c", "width": 1}, {"arrows": "to", "from": "d354208ae11b", "length": 500, "physics": true, "title": "Count: 1334", "to": "00991c153845", "width": 1}, {"arrows": "to", "from": "d872f1d4d982", "length": 500, "physics": true, "title": "Count: 1952", "to": "6172f14f6940", "width": 1}, {"arrows": "to", "from": "9c1663224390", "length": 500, "physics": true, "title": "Count: 1046", "to": "0f3d5ed4f01e", "width": 1}, {"arrows": "to", "from": "5382af1780c3", "length": 500, "physics": true, "title": "Count: 2192", "to": "dde1829883af", "width": 1}, {"arrows": "to", "from": "d63e02670ca4", "length": 500, "physics": true, "title": "Count: 1600", "to": "7c6bfbc6728f", "width": 1}, {"arrows": "to", "from": "8d3cbcb061fa", "length": 500, "physics": true, "title": "Count: 1588", "to": "9ff431433ba5", "width": 1}, {"arrows": "to", "from": "0295eb1d5bb3", "length": 500, "physics": true, "title": "Count: 1165", "to": "883023cd2176", "width": 1}, {"arrows": "to", "from": "1e74f7de5fee", "length": 500, "physics": true, "title": "Count: 1272", "to": "84d72f495149", "width": 1}, {"arrows": "to", "from": "b1c6a1a17cf6", "length": 500, "physics": true, "title": "Count: 3045", "to": "d70e49a0564d", "width": 1}, {"arrows": "to", "from": "5388eb68709d", "length": 500, "physics": true, "title": "Count: 1203", "to": "c6a4000ce640", "width": 1}, {"arrows": "to", "from": "121528ddc69a", "length": 500, "physics": true, "title": "Count: 1165", "to": "ed20ee4415e7", "width": 1}, {"arrows": "to", "from": "e87c02b81bcd", "length": 500, "physics": true, "title": "Count: 1200", "to": "20c450959e6f", "width": 1}, {"arrows": "to", "from": "87b4a56216bf", "length": 500, "physics": true, "title": "Count: 1259", "to": "8f139574f59e", "width": 1}, {"arrows": "to", "from": "7a350ba3f426", "length": 500, "physics": true, "title": "Count: 1708", "to": "e56cca93021e", "width": 1}, {"arrows": "to", "from": "dec72ce138e8", "length": 500, "physics": true, "title": "Count: 3074", "to": "aecb72e90c63", "width": 1}, {"arrows": "to", "from": "f0573a2b1f53", "length": 500, "physics": true, "title": "Count: 1290", "to": "2ed5f6d2dbed", "width": 1}, {"arrows": "to", "from": "416133b42e13", "length": 500, "physics": true, "title": "Count: 1339", "to": "20b1feeb828a", "width": 1}, {"arrows": "to", "from": "416133b42e13", "length": 500, "physics": true, "title": "Count: 1891", "to": "54d11fc01119", "width": 1}, {"arrows": "to", "from": "416133b42e13", "length": 500, "physics": true, "title": "Count: 2211", "to": "75d74d6426cd", "width": 1}, {"arrows": "to", "from": "416133b42e13", "length": 500, "physics": true, "title": "Count: 2507", "to": "e1f61f2afe82", "width": 1}, {"arrows": "to", "from": "1669ad4eea10", "length": 500, "physics": true, "title": "Count: 1300", "to": "897d38d8f946", "width": 1}, {"arrows": "to", "from": "ab91adac81c4", "length": 500, "physics": true, "title": "Count: 1411", "to": "3919de0824ae", "width": 1}, {"arrows": "to", "from": "0380d17bb7e8", "length": 500, "physics": true, "title": "Count: 1433", "to": "842e5783751e", "width": 1}, {"arrows": "to", "from": "92c0d91b9cc7", "length": 500, "physics": true, "title": "Count: 1902", "to": "f081330084d4", "width": 1}, {"arrows": "to", "from": "0a1cef59b20e", "length": 500, "physics": true, "title": "Count: 1008", "to": "db86a7fa3d4b", "width": 1}, {"arrows": "to", "from": "d95b969f68b0", "length": 500, "physics": true, "title": "Count: 2041", "to": "4ec347ab98f7", "width": 1}, {"arrows": "to", "from": "03f986404ca0", "length": 500, "physics": true, "title": "Count: 1744", "to": "e32c9a0aa488", "width": 1}, {"arrows": "to", "from": "5be1fc12fdbc", "length": 500, "physics": true, "title": "Count: 1961", "to": "758baad45177", "width": 1}, {"arrows": "to", "from": "5be1fc12fdbc", "length": 500, "physics": true, "title": "Count: 2672", "to": "c513e1b65487", "width": 1}, {"arrows": "to", "from": "b31dfc7ad834", "length": 500, "physics": true, "title": "Count: 2570", "to": "f51dd722d122", "width": 1}, {"arrows": "to", "from": "81d278d1040e", "length": 500, "physics": true, "title": "Count: 1092", "to": "3167418b03a6", "width": 1}, {"arrows": "to", "from": "931f65f782d9", "length": 500, "physics": true, "title": "Count: 3229", "to": "f122178bb340", "width": 1}, {"arrows": "to", "from": "8bb399be79f2", "length": 500, "physics": true, "title": "Count: 1434", "to": "624d7bfb3fea", "width": 1}, {"arrows": "to", "from": "da6621121223", "length": 500, "physics": true, "title": "Count: 1622", "to": "29a8990e9164", "width": 1}, {"arrows": "to", "from": "da6621121223", "length": 500, "physics": true, "title": "Count: 3679", "to": "ed20ee4415e7", "width": 1}, {"arrows": "to", "from": "f35d2349d4ea", "length": 500, "physics": true, "title": "Count: 1499", "to": "ea6fe06fe53f", "width": 1}, {"arrows": "to", "from": "3247e7df2a51", "length": 500, "physics": true, "title": "Count: 1618", "to": "754636b62c7e", "width": 1}, {"arrows": "to", "from": "5de7aa910c13", "length": 500, "physics": true, "title": "Count: 2949", "to": "f6c3109b1558", "width": 1}, {"arrows": "to", "from": "655778feaf22", "length": 500, "physics": true, "title": "Count: 1789", "to": "7f42362c00d7", "width": 1}, {"arrows": "to", "from": "48efab7ddb1d", "length": 500, "physics": true, "title": "Count: 3313", "to": "93465a23b536", "width": 1}, {"arrows": "to", "from": "ab0e4f728ae4", "length": 500, "physics": true, "title": "Count: 1087", "to": "7db6beda01c6", "width": 1}, {"arrows": "to", "from": "5ec6f4344447", "length": 500, "physics": true, "title": "Count: 1272", "to": "67e9e6528b42", "width": 1}, {"arrows": "to", "from": "21cc81247c75", "length": 500, "physics": true, "title": "Count: 1299", "to": "e38c0990c6a4", "width": 1}, {"arrows": "to", "from": "d6503809fec2", "length": 500, "physics": true, "title": "Count: 1998", "to": "16548c35482b", "width": 1}, {"arrows": "to", "from": "1935efee9a4e", "length": 500, "physics": true, "title": "Count: 1004", "to": "3a0a6c7c8088", "width": 1}, {"arrows": "to", "from": "1935efee9a4e", "length": 500, "physics": true, "title": "Count: 1565", "to": "7ea0fa556694", "width": 1}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": [
+            "physics"
+        ]
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
