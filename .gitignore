@@ -1,3 +1,6 @@
 .DS_Store
 
 data/data_css_challenge.csv
+data/data_css_challenge_cleaned.csv
+
+healthcare_model.pkl
