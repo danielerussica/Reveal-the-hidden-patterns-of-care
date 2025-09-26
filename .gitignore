@@ -1,2 +1,4 @@
 .DS_Store
-
+.env
+data/data_css_challenge.csv
+__pycache__/
