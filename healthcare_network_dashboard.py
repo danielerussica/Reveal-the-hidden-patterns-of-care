@@ -9,7 +9,17 @@ import warnings
 import hashlib
 import traceback
 import json
+import openai
+import os
 warnings.filterwarnings('ignore')
+
+# OpenAI client setup
+@st.cache_resource
+def get_openai_client():
+    return openai.OpenAI(
+        api_key=os.getenv("SWISS_AI_PLATFORM_API_KEY"),
+        base_url="https://api.swisscom.com/layer/swiss-ai-weeks/apertus-70b/v1"
+    )
 
 # Page configuration
 st.set_page_config(
@@ -1037,6 +1047,114 @@ class HealthcareNetworkDashboard:
                     file_name="node_statistics.csv",
                     mime="text/csv"
                 )
+        
+        # AI Chat Assistant - Expandable Widget
+        st.markdown("---")
+        self.render_chat_assistant()
+
+    def render_chat_assistant(self):
+        """Render the AI chat assistant as an expandable widget"""
+        with st.expander("💬 Chat with Healthcare Data Assistant", expanded=False):
+            st.markdown("""
+            Ask questions about the healthcare network data, patient flows, or request insights about treatment patterns.
+            The assistant has access to context about healthcare data analysis.
+            """)
+            
+            # Initialize session state for chat
+            if "healthcare_chat_model" not in st.session_state:
+                st.session_state["healthcare_chat_model"] = "swiss-ai/Apertus-70B"
+            
+            if "healthcare_chat_messages" not in st.session_state:
+                st.session_state.healthcare_chat_messages = []
+            
+            
+            # Clear conversation button
+            col1, col2 = st.columns([3, 1])
+            with col2:
+                if st.button("🗑️ Clear Chat", help="Clear conversation history"):
+                    st.session_state.healthcare_chat_messages = []
+                    st.rerun()
+            
+            # Chat input
+            if prompt := st.chat_input("Ask about healthcare data, network patterns, or patient flows..."):
+                # Load context from file if available
+                context_content = ""
+                context_path = "context.txt"
+                if os.path.exists(context_path):
+                    try:
+                        with open(context_path, 'r', encoding='utf-8') as f:
+                            context_content = f.read()
+                    except Exception as e:
+                        st.error(f"Error reading context file: {str(e)}")
+                
+                # Prepare the full prompt with context
+                full_prompt = ""
+                if context_content:
+                    full_prompt += f"Healthcare Data Analysis Context:\n{context_content}\n\n"
+                
+                # Add current data summary if data is loaded
+                if hasattr(self, 'data') and self.data is not None:
+                    data_summary = self.get_data_context_summary()
+                    full_prompt += f"Current Dashboard Data Summary:\n{data_summary}\n\n"
+                
+                full_prompt += f"User Question: {prompt}"
+                
+                # Add user message to history
+                st.session_state.healthcare_chat_messages.append({"role": "user", "content": full_prompt})
+                
+                # Display user message
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+                
+                # Generate and display assistant response
+                with st.chat_message("assistant"):
+                    try:
+                        client = get_openai_client()
+                        stream = client.chat.completions.create(
+                            model=st.session_state["healthcare_chat_model"],
+                            messages=[
+                                {"role": m["role"], "content": m["content"]}
+                                for m in st.session_state.healthcare_chat_messages
+                            ],
+                            stream=True,
+                        )
+                        response = st.write_stream(stream)
+                        st.session_state.healthcare_chat_messages.append({"role": "assistant", "content": response})
+                    except Exception as e:
+                        st.error(f"Error communicating with AI assistant: {str(e)}")
+                        st.info("Please check your API key configuration and internet connection.")
+                        # Remove the failed user message to avoid confusion
+                        if st.session_state.healthcare_chat_messages:
+                            st.session_state.healthcare_chat_messages.pop()
+
+    def get_data_context_summary(self):
+        """Generate a summary of current dashboard data for the AI assistant"""
+        if not hasattr(self, 'data') or self.data is None:
+            return "No data currently loaded in the dashboard."
+        
+        summary = []
+        summary.append(f"Healthcare dataset with {len(self.data):,} records")
+        summary.append(f"Unique patients: {self.data['patient_id'].nunique():,}")
+        
+        # Age distribution
+        age_counts = self.data['age'].value_counts().head(5)
+        summary.append(f"Top age groups: {', '.join([f'{age} ({count})' for age, count in age_counts.items()])}")
+        
+        # Treatment reasons
+        reason_counts = self.data['reason_for_treatment'].value_counts().head(5)
+        summary.append(f"Top treatment reasons: {', '.join([f'{reason} ({count})' for reason, count in reason_counts.items()])}")
+        
+        # Provider groups
+        provider_counts = self.data['healthcare_provider_main_group'].value_counts().head(5)
+        summary.append(f"Top provider groups: {', '.join([f'{provider} ({count})' for provider, count in provider_counts.items()])}")
+        
+        # Date range
+        if 'start_date' in self.data.columns:
+            start_date = self.data['start_date'].min()
+            end_date = self.data['start_date'].max()
+            summary.append(f"Date range: {start_date} to {end_date}")
+        
+        return "; ".join(summary)
 
 # Main execution
 if __name__ == "__main__":
