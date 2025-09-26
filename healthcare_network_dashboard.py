@@ -987,7 +987,7 @@ class HealthcareNetworkDashboard:
                 top_edges['to'] = top_edges['to'].apply(lambda x: x[:30] + '...' if len(x) > 30 else x)
                 # Translate column headers
                 top_edges_display = self.translate_dataframe_for_display(top_edges)
-                st.dataframe(top_edges_display, use_container_width=True)
+                st.dataframe(top_edges_display, use_container_width=True, hide_index=True)
             else:
                 st.info("No connections to display")
         
@@ -999,7 +999,7 @@ class HealthcareNetworkDashboard:
                 top_nodes['provider'] = top_nodes['provider'].apply(lambda x: x[:40] + '...' if len(x) > 40 else x)
                 # Translate column headers
                 top_nodes_display = self.translate_dataframe_for_display(top_nodes)
-                st.dataframe(top_nodes_display, use_container_width=True)
+                st.dataframe(top_nodes_display, use_container_width=True, hide_index=True)
             else:
                 st.info("No providers to display")
         
