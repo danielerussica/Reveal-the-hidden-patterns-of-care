@@ -1050,6 +1050,77 @@ class HealthcareNetworkDashboard:
         
         # AI Chat Assistant - Expandable Widget
         st.markdown("---")
+        
+        # Tab layout
+        tabs = ["Overview", "Network Analysis", "Provider Paths", "Patient Journeys"]
+        tab1, tab2, tab3, tab4 = st.tabs(tabs)
+        
+        with tab3:
+            st.header("🏥 Analisi Percorsi Provider")
+            
+            # Mostra prima i provider più attivi per guidare la scelta
+            provider_counts = self.data.groupby('healthcare_provider_type').size().sort_values(ascending=False)
+            st.sidebar.markdown("### Provider più attivi")
+            st.sidebar.dataframe(
+                provider_counts.head().reset_index().rename(
+                    columns={'healthcare_provider_type': 'Provider', 0: 'Num. Pazienti'}
+                )
+            )
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                providers = sorted(self.data['healthcare_provider_type'].unique())
+                selected_provider = st.selectbox(
+                    "Seleziona Provider",
+                    providers,
+                    key="provider_select"
+                )
+
+                min_count = st.slider(
+                    "Numero minimo di pazienti per percorso",
+                    min_value=1,
+                    max_value=100,
+                    value=5,
+                    key="min_count_slider"
+                )
+                
+                st.subheader("Diagramma dei Flussi")
+                sankey_fig = create_sankey_for_provider(self.data, selected_provider, min_count)
+                if sankey_fig is not None:  # Aggiungi questo controllo
+                    st.plotly_chart(sankey_fig, use_container_width=True)
+                else:
+                    st.warning("Non ci sono dati sufficienti per creare il diagramma Sankey. Prova a:")
+                    st.markdown("""
+                    - Ridurre il numero minimo di pazienti per percorso
+                    - Selezionare un provider con più pazienti
+                    - Verificare i dati del provider selezionato
+                    """)
+
+            # Statistiche nella colonna destra
+            with col2:
+                st.subheader("Statistiche Provider")
+                provider_stats = self.data[self.data['healthcare_provider_type'] == selected_provider]
+                
+                total_patients = provider_stats['patient_id'].nunique()
+                avg_visits = provider_stats.groupby('patient_id').size().mean()
+                
+                st.metric("Totale Pazienti", f"{total_patients:,}")
+                st.metric("Media Visite per Paziente", f"{avg_visits:.2f}")
+                
+                st.subheader("Top 5 Client Types")
+                top_clients = (provider_stats.groupby('client_type')
+                                           .size()
+                                           .sort_values(ascending=True)
+                                           .tail(5))
+                
+                fig = px.bar(y=top_clients.index, 
+                             x=top_clients.values,
+                             orientation='h',
+                             title="Client più frequenti")
+                st.plotly_chart(fig, use_container_width=True)
+        
+        # Render chat assistant at the end
         self.render_chat_assistant()
 
     def render_chat_assistant(self):
@@ -1156,7 +1227,66 @@ class HealthcareNetworkDashboard:
         
         return "; ".join(summary)
 
-# Main execution
+# Add these imports if not already present
+import plotly.graph_objects as go
+from collections import defaultdict
+
+# Add the provider path analysis functions
+def create_sankey_for_provider(df, selected_provider, min_count=5):
+    """Crea Sankey diagram con controlli di robustezza"""
+    try:
+        # Filtra per provider selezionato
+        provider_df = df[df['healthcare_provider_type'] == selected_provider]
+        
+        if provider_df.empty:
+            st.warning(f"Nessun dato disponibile per il provider {selected_provider}")
+            return None
+            
+        # Calcola e filtra le transizioni
+        transitions = provider_df.groupby(['healthcare_provider_type', 'client_type']).size().reset_index(name='count')
+        transitions = transitions[transitions['count'] >= min_count]
+        
+        if transitions.empty:
+            st.warning(f"Nessuna transizione con almeno {min_count} pazienti trovata. Prova a ridurre il valore minimo.")
+            return None
+        
+        # Crea nodi
+        nodes = pd.unique(
+            list(transitions['healthcare_provider_type']) + 
+            list(transitions['client_type'])
+        )
+        
+        node_indices = {node: idx for idx, node in enumerate(nodes)}
+        
+        # Crea figura Sankey
+        fig = go.Figure(data=[go.Sankey(
+            node=dict(
+                pad=15,
+                thickness=20,
+                line=dict(color="black", width=0.5),
+                label=nodes
+            ),
+            link=dict(
+                source=[node_indices[s] for s in transitions['healthcare_provider_type']],
+                target=[node_indices[t] for t in transitions['client_type']],
+                value=transitions['count'],
+                hovertemplate="Da: %{source.label}<br>" +
+                             "A: %{target.label}<br>" +
+                             "Pazienti: %{value}<extra></extra>"
+            )
+        )])
+        
+        fig.update_layout(
+            title_text=f"Flussi da {selected_provider} (min. {min_count} pazienti)",
+            font_size=10,
+            height=600
+        )
+        return fig
+        
+    except Exception as e:
+        st.error(f"Errore nella creazione del diagramma Sankey: {str(e)}")
+        return None
+# At the bottom of the file, add:
 if __name__ == "__main__":
     dashboard = HealthcareNetworkDashboard()
-    dashboard.run_dashboard() 
+    dashboard.run_dashboard()
