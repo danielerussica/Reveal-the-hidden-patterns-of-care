@@ -1051,74 +1051,70 @@ class HealthcareNetworkDashboard:
         # AI Chat Assistant - Expandable Widget
         st.markdown("---")
         
-        # Tab layout
-        tabs = ["Overview", "Network Analysis", "Provider Paths", "Patient Journeys"]
-        tab1, tab2, tab3, tab4 = st.tabs(tabs)
+        # Provider Paths Analysis
+        st.header("🏥 Provider Paths Analysis")
         
-        with tab3:
-            st.header("🏥 Analisi Percorsi Provider")
-            
-            # Mostra prima i provider più attivi per guidare la scelta
-            provider_counts = self.data.groupby('healthcare_provider_type').size().sort_values(ascending=False)
-            st.sidebar.markdown("### Provider più attivi")
-            st.sidebar.dataframe(
-                provider_counts.head().reset_index().rename(
-                    columns={'healthcare_provider_type': 'Provider', 0: 'Num. Pazienti'}
-                )
+        # Show most active providers first to guide selection
+        provider_counts = self.data.groupby('healthcare_provider_type').size().sort_values(ascending=False)
+        st.sidebar.markdown("### Most Active Providers")
+        st.sidebar.dataframe(
+            provider_counts.head().reset_index().rename(
+                columns={'healthcare_provider_type': 'Provider', 0: 'Num. Patients'}
+            )
+        )
+        
+        col1, col2 = st.columns([2, 1])
+        
+        with col1:
+            providers = sorted(self.data['healthcare_provider_type'].unique())
+            selected_provider = st.selectbox(
+                "Select Provider",
+                providers,
+                key="provider_select"
+            )
+
+            min_count = st.slider(
+                "Minimum number of patients per pathway",
+                min_value=1,
+                max_value=100,
+                value=5,
+                key="min_count_slider"
             )
             
-            col1, col2 = st.columns([2, 1])
+            st.subheader("Flow Diagram")
+            sankey_fig = create_sankey_for_provider(self.data, selected_provider, min_count)
+            if sankey_fig is not None:  # Add this check
+                st.plotly_chart(sankey_fig, use_container_width=True)
+            else:
+                st.warning("There is not enough data to create the Sankey diagram. Try to:")
+                st.markdown("""
+                - Reduce the minimum number of patients per pathway
+                - Select a provider with more patients
+                - Check the data for the selected provider
+                """)
+
+        # Statistics in the right column
+        with col2:
+            st.subheader("Provider Statistics")
+            provider_stats = self.data[self.data['healthcare_provider_type'] == selected_provider]
             
-            with col1:
-                providers = sorted(self.data['healthcare_provider_type'].unique())
-                selected_provider = st.selectbox(
-                    "Seleziona Provider",
-                    providers,
-                    key="provider_select"
-                )
-
-                min_count = st.slider(
-                    "Numero minimo di pazienti per percorso",
-                    min_value=1,
-                    max_value=100,
-                    value=5,
-                    key="min_count_slider"
-                )
-                
-                st.subheader("Diagramma dei Flussi")
-                sankey_fig = create_sankey_for_provider(self.data, selected_provider, min_count)
-                if sankey_fig is not None:  # Aggiungi questo controllo
-                    st.plotly_chart(sankey_fig, use_container_width=True)
-                else:
-                    st.warning("Non ci sono dati sufficienti per creare il diagramma Sankey. Prova a:")
-                    st.markdown("""
-                    - Ridurre il numero minimo di pazienti per percorso
-                    - Selezionare un provider con più pazienti
-                    - Verificare i dati del provider selezionato
-                    """)
-
-            # Statistiche nella colonna destra
-            with col2:
-                st.subheader("Statistiche Provider")
-                provider_stats = self.data[self.data['healthcare_provider_type'] == selected_provider]
-                
-                total_patients = provider_stats['patient_id'].nunique()
-                avg_visits = provider_stats.groupby('patient_id').size().mean()
-                
-                st.metric("Totale Pazienti", f"{total_patients:,}")
-                st.metric("Media Visite per Paziente", f"{avg_visits:.2f}")
-                
-                st.subheader("Top 5 Client Types")
-                top_clients = (provider_stats.groupby('client_type')
-                                           .size()
-                                           .sort_values(ascending=True)
-                                           .tail(5))
-                
-                fig = px.bar(y=top_clients.index, 
-                             x=top_clients.values,
-                             orientation='h',
-                             title="Client più frequenti")
-                st.plotly_chart(fig, use_container_width=True)
+            total_patients = provider_stats['patient_id'].nunique()
+            avg_visits = provider_stats.groupby('patient_id').size().mean()
+            
+            st.metric("Total Patients", f"{total_patients:,}")
+            st.metric("Average Visits per Patient", f"{avg_visits:.2f}")
+            
+            st.subheader("Top 5 Client Types")
+            top_clients = (provider_stats.groupby('client_type')
+                                       .size()
+                                       .sort_values(ascending=True)
+                                       .tail(5))
+            
+            fig = px.bar(y=top_clients.index, 
+                         x=top_clients.values,
+                         orientation='h',
+                             title="Most Frequent Clients")
+            st.plotly_chart(fig, use_container_width=True)
         
         # Render chat assistant at the end
         self.render_chat_assistant()
